@@ -176,7 +176,7 @@ export default function PendingClient({
 
   return (
     <>
-      <div className="pageHeader">
+      <div className="pageHeader" suppressHydrationWarning>
         <div>
           <h1>Access Requests</h1>
           <p>Review and manage pending question-limit expansion requests.</p>
@@ -185,7 +185,7 @@ export default function PendingClient({
 
       <div className="grid">
         {/* Keep first card exactly as it is */}
-        <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+        <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '24px' }} suppressHydrationWarning>
           <div style={{ backgroundColor: '#eef2ff', padding: '16px', borderRadius: '50%', color: '#4338ca' }}>
             <MessageSquare size={32} />
           </div>
@@ -196,7 +196,7 @@ export default function PendingClient({
         </div>
 
         {/* Approval Statistics */}
-        <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+        <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '24px' }} suppressHydrationWarning>
           <div style={{ backgroundColor: '#dcfce7', padding: '16px', borderRadius: '50%', color: '#16a34a' }}>
             <CheckCircle2 size={32} />
           </div>
@@ -208,7 +208,7 @@ export default function PendingClient({
         </div>
 
         {/* Rejected Requests */}
-        <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+        <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '24px' }} suppressHydrationWarning>
           <div style={{ backgroundColor: '#fee2e2', padding: '16px', borderRadius: '50%', color: '#dc2626' }}>
             <XCircle size={32} />
           </div>
@@ -244,7 +244,7 @@ export default function PendingClient({
         )}
       </div>
 
-      <div className="tableContainer">
+      <div className="tableContainer" suppressHydrationWarning>
         <table className="table">
           <thead>
             <tr>
@@ -324,7 +324,7 @@ export default function PendingClient({
       </div>
 
       {/* Status Overview Chart */}
-      <div className="card chartCard" style={{ marginTop: '24px' }}>
+      <div className="card chartCard" style={{ marginTop: '24px' }} suppressHydrationWarning>
         <div className="chartHeader">
           <h2 className="chartTitle">Request Status Overview</h2>
           <p className="chartSubtitle">Pending, approved, and rejected access requests from the database.</p>
