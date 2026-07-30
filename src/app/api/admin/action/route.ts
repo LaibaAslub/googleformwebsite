@@ -5,6 +5,7 @@ import { cookies } from 'next/headers';
 import bcrypt from 'bcryptjs';
 
 type TargetUser = {
+  id: string;
   full_name: string;
   email: string;
   designation?: string | null;
@@ -85,7 +86,7 @@ export async function POST(req: Request) {
     if (userId) {
       const { data } = await supabase
         .from('users')
-        .select('full_name, email, designation, status, expiry_date, questions_completed, question_limit, has_submitted')
+        .select('id,full_name, email, designation, status, expiry_date, questions_completed, question_limit, has_submitted')
         .eq('id', userId)
         .maybeSingle();
       targetUser = data;
