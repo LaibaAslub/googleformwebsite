@@ -80,7 +80,7 @@ export async function POST(req: Request) {
     const payload = await verifyToken(token);
     if (payload?.role !== 'admin') return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const { userId, action, expiryDate, questionLimit, newPassword } = await req.json();
+    const { userId, action, expiryDate, questionLimit, newPassword, status } = await req.json();
 
     let targetUser: TargetUser | null = null;
     if (userId) {
@@ -118,6 +118,8 @@ export async function POST(req: Request) {
       updateData = { status: 'rejected' };
     } else if (action === 'suspend') {
       updateData = { status: 'suspended' };
+    } else if (action === 'change_status') {
+      if (status) updateData = { status };
     } else if (action === 'change_expiry') {
       updateData = { expiry_date: expiryDate || null };
     } else if (action === 'change_limit') {

@@ -146,12 +146,37 @@ export default function ReviewPage() {
     setSubmitting(false);
   };
 
-  if (loading) return <div className={styles.reviewWrapper}><div className={styles.container}>Loading...</div></div>;
+  if (loading) {
+    return (
+      <div className={styles.reviewWrapper}>
+        <div className={styles.container}>
+          <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+            <img src="/banner.png" alt="University Banner" style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px' }} />
+          </div>
+          <div className={styles.mainHeader}>Employee Feedback Portal</div>
+          <div className={`${styles.card} ${styles.progressCard}`}>
+            <div style={{ height: '14px', width: '150px', backgroundColor: '#e5e7eb', borderRadius: '4px', marginBottom: '12px', animation: 'pulse 2s infinite' }}></div>
+            <div style={{ height: '28px', width: '300px', backgroundColor: '#e5e7eb', borderRadius: '8px', marginBottom: '24px', animation: 'pulse 2s infinite' }}></div>
+            <div style={{ height: '8px', width: '100%', backgroundColor: '#e5e7eb', borderRadius: '9999px', animation: 'pulse 2s infinite' }}></div>
+          </div>
+          <div className={styles.card}>
+            <div style={{ height: '24px', width: '80%', backgroundColor: '#e5e7eb', borderRadius: '6px', marginBottom: '24px', animation: 'pulse 2s infinite' }}></div>
+            <div style={{ height: '16px', width: '40%', backgroundColor: '#e5e7eb', borderRadius: '4px', marginBottom: '12px', animation: 'pulse 2s infinite' }}></div>
+            <div style={{ height: '100px', width: '100%', backgroundColor: '#e5e7eb', borderRadius: '8px', animation: 'pulse 2s infinite' }}></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (isCompleted) {
     return (
       <div className={styles.reviewWrapper}>
         <div className={styles.container}>
+          {/* Banner */}
+          <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+            <img src="/banner.png" alt="University Banner" style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px' }} />
+          </div>
           <div className={styles.mainHeader}>Employee Feedback Portal</div>
           <div className={`${styles.card} ${styles.progressCard}`}>
             <h1 className={styles.progressTitle}>Thank you!</h1>
@@ -166,6 +191,10 @@ export default function ReviewPage() {
     return (
       <div className={styles.reviewWrapper}>
         <div className={styles.container}>
+          {/* Banner */}
+          <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+            <img src="/banner.png" alt="University Banner" style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px' }} />
+          </div>
           <div className={styles.mainHeader}>Employee Feedback Portal</div>
           <div className={`${styles.card} ${styles.progressCard}`}>
             <h1 className={styles.progressTitle}>No Questions Assigned</h1>
@@ -177,13 +206,18 @@ export default function ReviewPage() {
   }
 
   const progressPct = ((currentIndex) / questions.length) * 100;
-  // Validation: both rating and comment are required
-  const isCurrentValid = currentResponse.rating > 0 && currentResponse.comment.trim().length > 0;
+  // Validation: rating, comment, and newAnswer are required
+  const isCurrentValid = currentResponse.rating > 0 && currentResponse.comment.trim().length > 0 && currentResponse.newAnswer.trim().length > 0;
 
   return (
     <div className={styles.reviewWrapper}>
       <div className={styles.container}>
         
+        {/* Banner */}
+        <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+          <img src="/banner.png" alt="University Banner" style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px' }} />
+        </div>
+
         {/* Main Header */}
         <div className={styles.mainHeader}>
           Employee Feedback Portal
@@ -241,7 +275,7 @@ export default function ReviewPage() {
             style={{ overflow: 'hidden', resize: 'none', minHeight: '40px' }}
           />
 
-          <div className={styles.inputLabel}>Suggest a New / Improved Answer (optional)</div>
+          <div className={styles.inputLabel}>Suggest a New / Improved Answer *</div>
           <textarea 
             ref={newAnswerRef}
             name="newAnswer"

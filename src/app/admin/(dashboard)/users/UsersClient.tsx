@@ -86,6 +86,69 @@ function UsersClient({ users: initialUsers }: { users: User[] }) {
   const [page, setPage] = useState(1);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [copiedHash, setCopiedHash] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editLimit, setEditLimit] = useState('');
+  const [editExpiry, setEditExpiry] = useState('');
+  const [editStatus, setEditStatus] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    if (selectedUser) {
+      setEditLimit(String(selectedUser.question_limit));
+      setEditStatus(selectedUser.status);
+      if (selectedUser.expiry_date) {
+        const d = new Date(selectedUser.expiry_date);
+        if (!Number.isNaN(d.getTime())) {
+          const tzOffset = d.getTimezoneOffset() * 60000;
+          setEditExpiry(new Date(d.getTime() - tzOffset).toISOString().slice(0, 16));
+        } else {
+          setEditExpiry('');
+        }
+      } else {
+        setEditExpiry('');
+      }
+      setIsEditing(false);
+    }
+  }, [selectedUser]);
+
+  const handleEditSave = async () => {
+    if (!selectedUser) return;
+    setBusy(true);
+    let success = true;
+
+    if (String(selectedUser.question_limit) !== editLimit) {
+      const resLimit = await fetch('/api/admin/action', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: selectedUser.id, action: 'change_limit', questionLimit: parseInt(editLimit, 10) })
+      });
+      if (!resLimit.ok) success = false;
+    }
+
+    const newExpiryIso = editExpiry ? new Date(editExpiry).toISOString() : null;
+    const resExpiry = await fetch('/api/admin/action', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: selectedUser.id, action: 'change_expiry', expiryDate: newExpiryIso })
+    });
+    if (!resExpiry.ok) success = false;
+
+    if (selectedUser.status !== editStatus) {
+      const resStatus = await fetch('/api/admin/action', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: selectedUser.id, action: 'change_status', status: editStatus })
+      });
+      if (!resStatus.ok) success = false;
+    }
+
+    if (success) {
+      window.location.reload();
+    } else {
+      alert('Failed to update some fields.');
+      setBusy(false);
+    }
+  };
 
 
 
@@ -540,7 +603,7 @@ function UsersClient({ users: initialUsers }: { users: User[] }) {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               onClick={e => e.stopPropagation()}
-              style={{ background: '#fff', borderRadius: '16px', width: '100%', maxWidth: '600px', overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }}
+              style={{ background: '#fff', borderRadius: '16px', width: '100%', maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto', display: 'flex', flexDirection: 'column', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }}
             >
               <div style={{ background: '#f9fafb', padding: '24px', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -552,10 +615,20 @@ function UsersClient({ users: initialUsers }: { users: User[] }) {
                     <p style={{ margin: 0, color: '#6b7280', fontSize: '0.875rem' }}>{selectedUser.email}</p>
                   </div>
                 </div>
-                <button onClick={() => setSelectedUser(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', color: '#9ca3af' }}><X size={24} /></button>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  {isEditing ? (
+                    <>
+                      <button onClick={() => setIsEditing(false)} disabled={busy} style={{ background: '#f3f4f6', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: 500 }}>Cancel</button>
+                      <button onClick={handleEditSave} disabled={busy} style={{ background: '#4338ca', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: 500 }}>{busy ? 'Saving...' : 'Save'}</button>
+                    </>
+                  ) : (
+                    <button onClick={() => setIsEditing(true)} style={{ background: '#eff6ff', color: '#3b82f6', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: 500 }}>Edit</button>
+                  )}
+                  <button onClick={() => setSelectedUser(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', color: '#9ca3af' }}><X size={24} /></button>
+                </div>
               </div>
 
-              <div style={{ padding: '24px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+              <div style={{ padding: '16px 24px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div>
                   <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: '#6b7280', fontWeight: 600, marginBottom: '4px' }}>ID</div>
                   <div style={{ fontFamily: 'monospace', fontSize: '0.875rem', color: '#111827' }}>{selectedUser.id}</div>
@@ -566,24 +639,55 @@ function UsersClient({ users: initialUsers }: { users: User[] }) {
                 </div>
                 <div>
                   <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: '#6b7280', fontWeight: 600, marginBottom: '4px' }}>Status</div>
-                  <span style={{
-                    padding: '4px 10px', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 600,
-                    background: `${getStatusColor(selectedUser)}20`, color: getStatusColor(selectedUser), textTransform: 'capitalize'
-                  }}>
-                    {selectedUser.status}
-                  </span>
+                  {isEditing ? (
+                    <select
+                      value={editStatus}
+                      onChange={e => setEditStatus(e.target.value)}
+                      style={{ width: '100%', padding: '6px', borderRadius: '6px', border: '1px solid #d1d5db' }}
+                    >
+                      <option value="pending">Pending</option>
+                      <option value="approved">Approved</option>
+                      <option value="rejected">Rejected</option>
+                      <option value="suspended">Suspended</option>
+                    </select>
+                  ) : (
+                    <span style={{
+                      padding: '4px 10px', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 600,
+                      background: `${getStatusColor(selectedUser)}20`, color: getStatusColor(selectedUser), textTransform: 'capitalize'
+                    }}>
+                      {selectedUser.status}
+                    </span>
+                  )}
                 </div>
                 <div>
                   <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: '#6b7280', fontWeight: 600, marginBottom: '4px' }}>Submission</div>
                   <div>{selectedUser.has_submitted ? <span style={{ color: '#10b981', fontWeight: 500 }}>Submitted</span> : <span style={{ color: '#6b7280' }}>Not Submitted</span>}</div>
                 </div>
                 <div>
-                  <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: '#6b7280', fontWeight: 600, marginBottom: '4px' }}>Progress</div>
-                  <div style={{ fontWeight: 500, color: '#111827' }}>{selectedUser.questions_completed} / {selectedUser.question_limit} completed</div>
+                  <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: '#6b7280', fontWeight: 600, marginBottom: '4px' }}>Progress / Limit</div>
+                  {isEditing ? (
+                    <input 
+                      type="number" 
+                      value={editLimit} 
+                      onChange={e => setEditLimit(e.target.value)}
+                      style={{ width: '100%', padding: '6px', borderRadius: '6px', border: '1px solid #d1d5db' }}
+                    />
+                  ) : (
+                    <div style={{ fontWeight: 500, color: '#111827' }}>{selectedUser.questions_completed} / {selectedUser.question_limit} completed</div>
+                  )}
                 </div>
                 <div>
                   <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: '#6b7280', fontWeight: 600, marginBottom: '4px' }}>Expiry Date</div>
-                  <div>{getExpiryDisplay(selectedUser.expiry_date)}</div>
+                  {isEditing ? (
+                    <input 
+                      type="datetime-local" 
+                      value={editExpiry} 
+                      onChange={e => setEditExpiry(e.target.value)}
+                      style={{ width: '100%', padding: '6px', borderRadius: '6px', border: '1px solid #d1d5db' }}
+                    />
+                  ) : (
+                    <div>{getExpiryDisplay(selectedUser.expiry_date)}</div>
+                  )}
                 </div>
                 <div>
                   <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: '#6b7280', fontWeight: 600, marginBottom: '4px' }}>Created At</div>

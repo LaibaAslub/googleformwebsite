@@ -56,10 +56,18 @@ export default function ScrollReveal() {
       });
     };
 
-    bindTargets();
+    let timeoutId: NodeJS.Timeout;
+    const scheduleBind = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        requestAnimationFrame(bindTargets);
+      }, 150);
+    };
+
+    scheduleBind();
 
     const mutationObserver = new MutationObserver(() => {
-      bindTargets();
+      scheduleBind();
     });
 
     mutationObserver.observe(root, { childList: true, subtree: true });

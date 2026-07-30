@@ -334,7 +334,7 @@ export default function PendingClient({
                   }}
                 />
                 <span style={{ fontWeight: 400, color: '#6b7280', fontSize: '0.8rem' }}>
-                  Controls how long the user&apos;s email/password access remains valid. Leave blank for no expiry.
+                  Controls how long the user&apos;s email/password access remains valid. <span style={{ color: '#dc2626' }}>Required for approval.</span>
                 </span>
               </label>
             </div>
@@ -356,8 +356,17 @@ export default function PendingClient({
               </button>
               <button
                 onClick={() => handleAction(selectedUser.id, 'approve')}
-                disabled={busy}
-                style={{ backgroundColor: '#4338ca', color: '#ffffff', border: 'none', padding: '8px 16px', borderRadius: '6px', fontWeight: 500, cursor: 'pointer' }}
+                disabled={busy || !expiryInput}
+                style={{ 
+                  backgroundColor: (busy || !expiryInput) ? '#9ca3af' : '#4338ca', 
+                  color: '#ffffff', 
+                  border: 'none', 
+                  padding: '8px 16px', 
+                  borderRadius: '6px', 
+                  fontWeight: 500, 
+                  cursor: (busy || !expiryInput) ? 'not-allowed' : 'pointer' 
+                }}
+                title={!expiryInput ? 'Expiry Date & Time is required' : ''}
               >
                 Approve User
               </button>
