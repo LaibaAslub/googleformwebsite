@@ -336,8 +336,13 @@
 
 .reveal-bound.is-visible {
   animation: slideUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  animation-delay: var(--reveal-delay, 0ms);
 }
+.reveal-bound.is-visible[data-reveal-delay="0"] { animation-delay: 0ms; }
+.reveal-bound.is-visible[data-reveal-delay="60"] { animation-delay: 60ms; }
+.reveal-bound.is-visible[data-reveal-delay="120"] { animation-delay: 120ms; }
+.reveal-bound.is-visible[data-reveal-delay="180"] { animation-delay: 180ms; }
+.reveal-bound.is-visible[data-reveal-delay="240"] { animation-delay: 240ms; }
+.reveal-bound.is-visible[data-reveal-delay="300"] { animation-delay: 300ms; }
 
 @keyframes fadeIn {
   from {

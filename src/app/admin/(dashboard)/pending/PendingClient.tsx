@@ -42,7 +42,7 @@ function toDateInputValue(value?: string | null) {
   const d = new Date(value);
   if (Number.isNaN(d.getTime())) return '';
   const tzOffset = d.getTimezoneOffset() * 60000;
-  return (new Date(d.getTime() - tzOffset)).toISOString().slice(0, 16);
+  return (new Date(d.getTime() - tzOffset)).toISOString().slice(0, 10);
 }
 
 export default function PendingClient({
@@ -167,7 +167,7 @@ export default function PendingClient({
               <th>Designation</th>
               <th>Email</th>
               <th>New Questions</th>
-              <th>Expiry Date & Time</th>
+              <th>Expiry Date</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -320,9 +320,9 @@ export default function PendingClient({
               </label>
 
               <label style={{ display: 'grid', gap: '6px', fontSize: '0.85rem', color: '#374151', fontWeight: 600 }}>
-                Expiry Date & Time
+                Expiry Date
                 <input
-                  type="datetime-local"
+                  type="date"
                   value={expiryInput}
                   onChange={(e) => setExpiryInput(e.target.value)}
                   style={{
@@ -366,7 +366,7 @@ export default function PendingClient({
                   fontWeight: 500, 
                   cursor: (busy || !expiryInput) ? 'not-allowed' : 'pointer' 
                 }}
-                title={!expiryInput ? 'Expiry Date & Time is required' : ''}
+                title={!expiryInput ? 'Expiry Date is required' : ''}
               >
                 Approve User
               </button>

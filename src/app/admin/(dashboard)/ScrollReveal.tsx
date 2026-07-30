@@ -51,7 +51,8 @@ export default function ScrollReveal() {
     const bindTargets = () => {
       collectTargets(root).forEach((el, index) => {
         el.classList.add('reveal-bound');
-        (el as HTMLElement).style.setProperty('--reveal-delay', `${Math.min(index % 6, 5) * 60}ms`);
+        const delayMs = Math.min(index % 6, 5) * 60;
+        el.setAttribute('data-reveal-delay', String(delayMs));
         observer.observe(el);
       });
     };
@@ -75,6 +76,13 @@ export default function ScrollReveal() {
     return () => {
       observer.disconnect();
       mutationObserver.disconnect();
+      clearTimeout(timeoutId);
+      
+      // Cleanup DOM modifications to prevent Next.js hydration errors during HMR or navigation
+      document.querySelectorAll('.reveal-bound').forEach((el) => {
+        el.classList.remove('reveal-bound', 'is-visible');
+        el.removeAttribute('data-reveal-delay');
+      });
     };
   }, [pathname]);
 

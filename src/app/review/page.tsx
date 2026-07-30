@@ -206,8 +206,8 @@ export default function ReviewPage() {
   }
 
   const progressPct = ((currentIndex) / questions.length) * 100;
-  // Validation: rating, comment, and newAnswer are required
-  const isCurrentValid = currentResponse.rating > 0 && currentResponse.comment.trim().length > 0 && currentResponse.newAnswer.trim().length > 0;
+  // Validation: rating and newAnswer are required
+  const isCurrentValid = currentResponse.rating > 0 && currentResponse.newAnswer.trim().length > 0;
 
   return (
     <div className={styles.reviewWrapper}>
@@ -263,18 +263,6 @@ export default function ReviewPage() {
             ))}
           </div>
 
-          <div className={styles.inputLabel}>Your Comment *</div>
-          <textarea 
-            ref={commentRef}
-            name="comment"
-            className={styles.textArea} 
-            placeholder="Your answer"
-            value={currentResponse.comment}
-            onChange={handleChange}
-            rows={1}
-            style={{ overflow: 'hidden', resize: 'none', minHeight: '40px' }}
-          />
-
           <div className={styles.inputLabel}>Suggest a New / Improved Answer *</div>
           <textarea 
             ref={newAnswerRef}
@@ -282,6 +270,18 @@ export default function ReviewPage() {
             className={styles.textArea} 
             placeholder="Your answer"
             value={currentResponse.newAnswer}
+            onChange={handleChange}
+            rows={1}
+            style={{ overflow: 'hidden', resize: 'none', minHeight: '40px' }}
+          />
+
+          <div className={styles.inputLabel}>Your Comment (Optional)</div>
+          <textarea 
+            ref={commentRef}
+            name="comment"
+            className={styles.textArea} 
+            placeholder="Your answer"
+            value={currentResponse.comment}
             onChange={handleChange}
             rows={1}
             style={{ overflow: 'hidden', resize: 'none', minHeight: '40px' }}

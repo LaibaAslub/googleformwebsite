@@ -100,7 +100,7 @@ function UsersClient({ users: initialUsers }: { users: User[] }) {
         const d = new Date(selectedUser.expiry_date);
         if (!Number.isNaN(d.getTime())) {
           const tzOffset = d.getTimezoneOffset() * 60000;
-          setEditExpiry(new Date(d.getTime() - tzOffset).toISOString().slice(0, 16));
+          setEditExpiry(new Date(d.getTime() - tzOffset).toISOString().slice(0, 10));
         } else {
           setEditExpiry('');
         }
@@ -680,7 +680,7 @@ function UsersClient({ users: initialUsers }: { users: User[] }) {
                   <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: '#6b7280', fontWeight: 600, marginBottom: '4px' }}>Expiry Date</div>
                   {isEditing ? (
                     <input 
-                      type="datetime-local" 
+                      type="date" 
                       value={editExpiry} 
                       onChange={e => setEditExpiry(e.target.value)}
                       style={{ width: '100%', padding: '6px', borderRadius: '6px', border: '1px solid #d1d5db' }}

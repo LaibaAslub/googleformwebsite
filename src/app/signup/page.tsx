@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import styles from '../login.module.css'; // Reuse existing styles
+import { motion } from 'framer-motion';
+import styles from '../login.module.css';
 
 export default function SignupPage() {
   const [loading, setLoading] = useState(false);
@@ -51,10 +52,34 @@ export default function SignupPage() {
     }
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0, y: 30, scale: 0.95 },
+    visible: { 
+      opacity: 1, 
+      y: 0, 
+      scale: 1,
+      transition: { 
+        duration: 0.6, 
+        ease: [0.16, 1, 0.3, 1],
+        staggerChildren: 0.1 
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 15 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } }
+  };
+
   return (
     <div className={styles.loginWrapper}>
-      <div className={styles.loginCard + ' animate-fade-in'}>
-        <div className={styles.header}>
+      <motion.div 
+        className={styles.loginCard}
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        <motion.div className={styles.header} variants={itemVariants}>
           <div className={styles.portalBadge}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2L2 12L12 22L22 12L12 2Z" />
@@ -63,102 +88,122 @@ export default function SignupPage() {
           </div>
           <h1 className={styles.title}>Request Access</h1>
           <p className={styles.subtitle}>Fill in your details to submit a registration request.</p>
-        </div>
+        </motion.div>
 
-        {error && <div className={styles.errorMsg}>{error}</div>}
+        {error && (
+          <motion.div 
+            className={styles.errorMsg} 
+            initial={{ opacity: 0, height: 0, marginBottom: 0 }}
+            animate={{ opacity: 1, height: 'auto', marginBottom: '1.5rem' }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            {error}
+          </motion.div>
+        )}
         
         {success ? (
-          <div className={styles.successMsg}>
+          <motion.div 
+            className={styles.successMsg}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+          >
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 1rem', display: 'block', color: '#10b981' }}>
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
             {successMessage}
-            <div style={{ marginTop: '1rem' }}>
-              <Link href="/" style={{ color: 'var(--form-primary)', textDecoration: 'underline' }}>Back to Login</Link>
+            <div style={{ marginTop: '2rem' }}>
+              <Link href="/" className={styles.secondaryBtn}>
+                Back to Login
+              </Link>
             </div>
-          </div>
+          </motion.div>
         ) : (
           <form onSubmit={handleSubmit}>
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Full Name</label>
-              <input 
-                type="text" 
-                name="fullName"
-                placeholder="John Doe" 
-                value={formData.fullName}
-                onChange={handleChange}
-                required 
-              />
-            </div>
+            <motion.div className={styles.formGrid} variants={itemVariants}>
+              <div className={styles.formGroup} style={{ marginBottom: 0 }}>
+                <label className={styles.label}>Full Name</label>
+                <input 
+                  type="text" 
+                  name="fullName"
+                  className={styles.inputField}
+                  placeholder="John Doe" 
+                  value={formData.fullName}
+                  onChange={handleChange}
+                  required 
+                />
+              </div>
+              
+              <div className={styles.formGroup} style={{ marginBottom: 0 }}>
+                <label className={styles.label}>Designation</label>
+                <input 
+                  type="text" 
+                  name="designation"
+                  className={styles.inputField}
+                  placeholder="Reviewer" 
+                  value={formData.designation}
+                  onChange={handleChange}
+                  required 
+                />
+              </div>
+            </motion.div>
             
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Designation / Role</label>
-              <input 
-                type="text" 
-                name="designation"
-                placeholder="Reviewer" 
-                value={formData.designation}
-                onChange={handleChange}
-                required 
-              />
-            </div>
-            
-            <div className={styles.formGroup}>
+            <motion.div className={styles.formGroup} variants={itemVariants} style={{ marginTop: '1.5rem' }}>
               <label className={styles.label}>Email</label>
               <input 
                 type="email" 
                 name="email"
+                className={styles.inputField}
                 placeholder="john@company.com" 
                 value={formData.email}
                 onChange={handleChange}
                 required 
               />
-            </div>
+            </motion.div>
             
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Password</label>
-              <input 
-                type="password" 
-                name="password"
-                placeholder="••••••••" 
-                value={formData.password}
-                onChange={handleChange}
-                required 
-              />
-            </div>
-            
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Requested Question Limit</label>
-              <input 
-                type="number" 
-                name="questionLimit"
-                min="1"
-                value={formData.questionLimit}
-                onChange={handleChange}
-                required 
-              />
-            </div>
+            <motion.div className={styles.formGrid} variants={itemVariants}>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Password</label>
+                <input 
+                  type="password" 
+                  name="password"
+                  className={styles.inputField}
+                  placeholder="••••••••" 
+                  value={formData.password}
+                  onChange={handleChange}
+                  required 
+                />
+              </div>
+              
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Question Limit</label>
+                <input 
+                  type="number" 
+                  name="questionLimit"
+                  className={styles.inputField}
+                  min="1"
+                  value={formData.questionLimit}
+                  onChange={handleChange}
+                  required 
+                />
+              </div>
+            </motion.div>
 
-            <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <motion.div style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }} variants={itemVariants}>
               <button type="submit" className={styles.submitBtn} disabled={loading}>
                 {loading ? 'Submitting...' : 'Submit Request'}
               </button>
-              <Link href="/" style={{
-                display: 'block',
-                width: '100%',
-                padding: '0.75rem',
-                textAlign: 'center',
-                backgroundColor: 'transparent',
-                color: 'var(--form-primary)',
-                border: '1px solid var(--form-primary)',
-                borderRadius: '8px',
-                fontWeight: '500',
-                textDecoration: 'none',
-                marginTop: '0.5rem'
-              }}>
-                Login
+              <Link href="/" className={styles.secondaryBtn}>
+                Login to Existing Account
               </Link>
-            </div>
+            </motion.div>
           </form>
         )}
-      </div>
+      </motion.div>
     </div>
   );
 }
