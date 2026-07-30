@@ -153,7 +153,7 @@ export default function ReviewPage() {
           <div style={{ textAlign: 'center', marginBottom: '24px' }}>
             <img src="/banner.png" alt="University Banner" style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px' }} />
           </div>
-          <div className={styles.mainHeader}>Employee Feedback Portal</div>
+          <div className={styles.mainHeader}>Hallucination Feedback</div>
           <div className={`${styles.card} ${styles.progressCard}`}>
             <div style={{ height: '14px', width: '150px', backgroundColor: '#e5e7eb', borderRadius: '4px', marginBottom: '12px', animation: 'pulse 2s infinite' }}></div>
             <div style={{ height: '28px', width: '300px', backgroundColor: '#e5e7eb', borderRadius: '8px', marginBottom: '24px', animation: 'pulse 2s infinite' }}></div>
@@ -177,7 +177,7 @@ export default function ReviewPage() {
           <div style={{ textAlign: 'center', marginBottom: '24px' }}>
             <img src="/banner.png" alt="University Banner" style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px' }} />
           </div>
-          <div className={styles.mainHeader}>Employee Feedback Portal</div>
+          <div className={styles.mainHeader}>Hallucination Feedback</div>
           <div className={`${styles.card} ${styles.progressCard}`}>
             <h1 className={styles.progressTitle}>Thank you!</h1>
             <p>You have completed all your assigned questions. Your responses have been saved securely.</p>
@@ -195,7 +195,7 @@ export default function ReviewPage() {
           <div style={{ textAlign: 'center', marginBottom: '24px' }}>
             <img src="/banner.png" alt="University Banner" style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px' }} />
           </div>
-          <div className={styles.mainHeader}>Employee Feedback Portal</div>
+          <div className={styles.mainHeader}>Hallucination Feedback</div>
           <div className={`${styles.card} ${styles.progressCard}`}>
             <h1 className={styles.progressTitle}>No Questions Assigned</h1>
             <p>There are no questions assigned to your account at this time. Please contact the administrator to assign questions.</p>
@@ -220,7 +220,7 @@ export default function ReviewPage() {
 
         {/* Main Header */}
         <div className={styles.mainHeader}>
-          Employee Feedback Portal
+          Hallucination Feedback
         </div>
 
         {/* Progress Header Card */}
