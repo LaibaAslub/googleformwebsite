@@ -4,5 +4,5 @@ import { clearSession } from '@/lib/auth';
 export async function POST(request: NextRequest) {
   await clearSession();
   const origin = request.nextUrl.origin;
-  return NextResponse.redirect(new URL('/admin/login', origin));
+  return NextResponse.redirect(new URL('/admin/login', origin), { status: 303 });
 }
