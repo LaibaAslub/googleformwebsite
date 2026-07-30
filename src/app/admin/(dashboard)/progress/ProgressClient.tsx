@@ -80,6 +80,12 @@ export default function ProgressClient({
   const [pwdBusy, setPwdBusy] = useState<number | null>(null);
   const [pwdRequests, setPwdRequests] = useState<PasswordRequestRow[]>(passwordRequests);
 
+  const [reviewerPage, setReviewerPage] = useState(1);
+  const reviewersPerPage = 10;
+  const totalReviewers = users.length;
+  const totalReviewerPages = Math.max(1, Math.ceil(totalReviewers / reviewersPerPage));
+  const pagedReviewers = users.slice((reviewerPage - 1) * reviewersPerPage, reviewerPage * reviewersPerPage);
+
   useEffect(() => {
     setPwdRequests(passwordRequests);
   }, [passwordRequests]);
@@ -385,7 +391,7 @@ export default function ProgressClient({
             </tr>
           </thead>
           <tbody>
-            {users.map((user: any) => {
+            {pagedReviewers.map((user: any) => {
               const initials = user.full_name.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase();
               const pct = user.question_limit > 0 ? (user.questions_completed / user.question_limit) * 100 : 0;
 
@@ -420,6 +426,28 @@ export default function ProgressClient({
             })}
           </tbody>
         </table>
+        
+        <div className="pagination">
+          <span style={{ fontSize: '0.85rem', color: '#6b7280' }}>{totalReviewers} reviewers total</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button className="pageBtn" onClick={() => setReviewerPage(p => Math.max(1, p - 1))} disabled={reviewerPage === 1}>&lt;</button>
+            {Array.from({ length: Math.min(3, totalReviewerPages) }, (_, i) => {
+              // Simple windowing logic
+              let startPage = Math.max(1, reviewerPage - 1);
+              if (startPage + 2 > totalReviewerPages) startPage = Math.max(1, totalReviewerPages - 2);
+              return startPage + i;
+            }).map(n => (
+              <button
+                key={n}
+                className="pageBtn"
+                onClick={() => setReviewerPage(n)}
+                style={{ background: reviewerPage === n ? '#4338ca' : '#fff', color: reviewerPage === n ? '#fff' : '#374151', borderColor: reviewerPage === n ? '#4338ca' : '#d1d5db' }}
+              >{n}</button>
+            ))}
+            {totalReviewerPages > 3 && reviewerPage < totalReviewerPages - 1 && <span style={{ color: '#6b7280' }}>... {totalReviewerPages}</span>}
+            <button className="pageBtn" onClick={() => setReviewerPage(p => Math.min(totalReviewerPages, p + 1))} disabled={reviewerPage === totalReviewerPages}>&gt;</button>
+          </div>
+        </div>
       </div>
 
       {/* Password Change Requests */}
