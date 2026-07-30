@@ -58,9 +58,9 @@ const AnimatedCounter = ({ value }: { value: number }) => {
   }, [value]);
   return <>{count}</>;
 };
-function UsersClient() {
+function UsersClient({ users: initialUsers }: { users: User[] }) {
   // State for users data
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<User[]>(initialUsers || []);
   const [loading, setLoading] = useState(true);
 
   // Fetch users from Supabase on component mount
@@ -86,7 +86,7 @@ function UsersClient() {
   const [page, setPage] = useState(1);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [copiedHash, setCopiedHash] = useState<string | null>(null);
-  
+
 
 
 
