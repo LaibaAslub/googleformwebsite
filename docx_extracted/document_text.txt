@@ -1,0 +1,128 @@
+PROJECT REQUIREMENTS DOCUMENT
+Disguised Answer-Review Platform
+(A website that looks like Google Forms + Admin-controlled Access + Supabase Backend)
+Prepared: July 2026
+1. Project Overview
+This website is an Answer-Review / Feedback Collection platform that looks exactly like a normal Google Form — no one viewing it will be able to tell that a controlled, admin-managed research system is running behind the scenes.
+The system has 3 core parts:
+Admin Dashboard — access control, question bank management, and live reporting
+User Login/Request Flow — the user creates their own email/password and submits an access request; the admin decides whether to accept or reject it and sets a fresh expiry date each time
+Google-Form-style Review Interface — where the user is randomly given N questions (with existing answers) of their own choosing, which they review, rate, and comment on
+All data — the question, the existing answer, the user's comment, the rating, and (if provided) a new answer — is saved to the Supabase database, and the admin can download/export it at any time.
+2. User Access Flow (Admin-Controlled Login System)
+No user can sign up freely on their own — access is only granted through an admin-approved request. The user chooses and enters their own email/password when submitting the access request; the admin does not create or issue the credentials. The admin's role is to review each request and decide whether to accept or reject it, and to set the expiry date — both decided fresh by the admin every time, including on renewal after an expiry. The process is:
+1) The user goes to the login/request page and enters their own chosen email + password, along with their Full Name, Designation/Role, and how many questions they want to solve (this number is decided by the user themselves, there is no fixed limit).
+2) This submission becomes an 'Access Request' and goes to the Admin Dashboard — the user cannot enter immediately.
+3) The admin reviews the request (Name, Designation, Email, Password, Chosen Question-Limit) — the admin can keep the user's requested number of questions as-is, or increase/decrease it as they see fit — sets an Expiry Date for this login, and Accepts or Rejects the request.
+4) Only once accepted does the user get access to the actual 'review form' (which looks like Google Forms), using the same email/password they entered when submitting the request.
+Screen 1 — Login Page (designed to look like a completely standard/normal login page — no 'form' look at all, so no one can guess that a Google-Form-style interface follows)
+⚠ Important: 
+Passwords are stored hashed (encrypted) in the backend — even though the user enters and chooses their own password, it is never stored in plain text; the admin can see it in the dashboard for reference while reviewing the request, but it always stays securely hashed in the database.
+2.1 — Expiry Date on Credentials
+When the user submits an access request with their own chosen email/password, the admin decides the Expiry Date for that login at the time of approval (this is not fixed — the admin can set whatever date they consider appropriate each time). Once that date passes, that same email/password will no longer work for login — even if the password is entered correctly, the system will block the login and show a message like 'Account expired, please contact admin.'
+Each credential (email/password pair) has its own independent expiry date — the admin can set a different date for each user whenever they like.
+If a user wants access again after their expiry date has passed, the user will need to sign in again — entering their email/password and details as a fresh access request. The admin will then decide again whether to accept or reject it and will set a new expiry date, exactly as with a first-time request.
+2.2 — Question-Limit is User-Requested but Admin-Adjustable
+Previously it was a fixed '10 questions per user' — now the user states how many questions they want to solve at the time of login/request (as shown as '15' in the screen above), but this is only a request, not a fixed guarantee. While reviewing and accepting the request, the admin can see the user's chosen number and has full control to change it — the admin may keep it as-is, or increase or decrease it to whatever number they decide (e.g. give 30 even if the user asked for 10, or give fewer). Whatever number the admin finally sets is what the system will assign as random, unused questions to the user.
+3. Admin Dashboard
+The admin dashboard is the control-center of the system. It includes:
+Reviewing incoming access requests (with the email/password the user entered themselves), deciding to accept/reject each one, setting a fresh expiry date on approval, and adjusting the assigned question-limit up or down if needed
+Viewing pending access requests — showing Name, Designation, Email, Password, Expiry Date, and the user's chosen Question-Limit — and Accepting / Rejecting them
+Viewing each user's progress — how many questions were assigned, how many were completed
+Live stats: Total Questions (1000), Solved/Reviewed, Remaining, Active Users
+Viewing the full list of solved and pending questions
+Viewing all collected data (comments, ratings, new answers) and exporting/downloading it in CSV/Excel format
+Screen 2 — Admin Dashboard: Pending Requests (with Expiry Date + Question Limit columns) + Live Stats + User Progress
+4. Main Review Interface — Google Form Style
+Once the admin accepts the request, the user lands on this interface. The design is intentionally kept very close to Google Forms (the same purple color, the same card-style layout, the same progress bar) so that anyone looking at it believes it's a normal Google Form.
+Progress bar at top: 'Question X of N' — where N is the number the user chose themselves at login/request time
+On each card: the question text + its existing answer
+Star rating system (1 to 5) — the user rates the quality of the answer
+Comment box — for writing their opinion/feedback
+Optional 'New Answer' box — in case the user wants to provide a better answer
+Next / Back buttons let the user move through their chosen N questions
+Screen 3 — User Review Screen (disguised design that looks like Google Forms)
+Once the user's chosen number (N) of questions is completed, all the data is saved to Supabase — either all at once or after each individual question — and the user sees a 'Thank you / Submitted' screen.
+5. Question Bank Logic (1000 Questions System)
+The backend database already contains a total of 1000 questions (along with their existing answers).
+At the time of login/request, the user states how many questions (N) they want to solve — there is no fixed number, each user can request more or less as they wish; however, the admin can increase or decrease this N while approving the request, so the final N assigned to the user is whatever the admin sets.
+As soon as the admin approves, the system randomly assigns N unused questions from the 1000 to that user.
+Once a user's N questions are solved/submitted, those questions get marked as 'used/completed.'
+Once a question is completed, it will never be shown again to any user — whether that's a new user or the same user logging in again.
+If the same user gets a new access approval from the admin again (a new email/password that hasn't expired), they will then receive a fresh set of N (completely new, previously unused) questions.
+Questions are selected randomly for each user — there is no fixed order.
+If a user's email/password has expired, login simply won't happen — no matter what their chosen N was.
+⚠ Important: 
+Since each question is used only once, and there are 1000 in total, total capacity = 1000 ÷ (average N per user). If a user chooses a large N (say 200), the available pool could run out quickly. When the remaining questions are fewer than a user's chosen N (say only 4 are left but the user requested 10), the system will either assign only as many as are available or alert the admin — this behavior will be finalized before development begins.
+6. Database Structure — Supabase (Full Real View)
+Below are the actual tables inside Supabase (with dummy/demo data) to show how the data is organized in storage and how it will look once downloaded.
+6.1 — Table: users
+This table holds each user's record. This text explanation matches the Supabase image exactly, column by column:
+id (
+uuid
+)
+ — a unique identifier for each record, auto-generated by 
+Supabase
+ (e.g. 
+a1f9-...-3e2c
+)
+full_name
+ — the user's full name, entered by the user themselves at request time
+designation — the user's role/designation
+email — the email the user entered themselves at request time (used for login)
+password (hashed) — the password the user entered themselv
+es, stored encrypted and never in plain text
+status — the approval status of the request (pending / accepted / rejected)
+question_limit — the final number of questions assigned, as decided by the admin (may differ from what the user originally requested)
+questions_completed
+ — how many of the assigned questions the user has completed so far (progress)
+expiry_date
+ — the date set by the admin after which this login stops working
+created — the date/time the record was first created (this appears at the end in the Supabase image)
+Supabase Table Editor — 'users' table (dummy data) — login gets blocked once expiry_date has passed
+6.2 — Table: questions
+This is the master bank of 1000 questions. Column by column, matching the Supabase image:
+question_text — the text of the question
+existing_answer — the existing/original answer already on file for that question
+category — the subject/category the question belongs to
+status — available / assigned / completed
+assigned_to — a record of which user the question is currently assigned to
+assigned_at — the date/time the question was assigned to that user
+Supabase Table Editor — 'questions' table (dummy data, 1000 rows)
+6.3 — Table: responses (Final Collected Data)
+This is the table where the user's actual work gets saved. Column by column, matching the Supabase image:
+question_text — the text of the question that was answered
+original_answer — the existing answer that was shown to the user
+user_comment — the user's written feedback/opinion on the answer
+rating — the 1-to-5 star rating the user gave the answer
+new_answer — the improved answer, if the user chose to provide one
+submitted_at — the date/time the response was saved (matching the column name shown in the Supabase image, not 'timestamp')
+Supabase Table Editor — 'responses' table (dummy data) — this table is the actual 'result' that the admin will download
+A fourth table, 'admin_logs,' will also be kept to track which admin accepted/rejected which user and when — for audit/history purposes.
+7. Data Download / Export
+The admin can export/download the 'responses' table in CSV format with one click from the dashboard, which can then be opened in Excel or Google Sheets, with well-structured columns: ID, user email, name, designation (the role of the user filling out the form), question ID, question text, original answer, user comment, rating, new answer, and submitted_at.
+Downloaded CSV file — view when opened in Excel
+8. Suggested Tech Stack
+Layer
+Technology
+Frontend
+React / Next.js — custom UI styled like Google Forms
+Backend / Database
+Supabase (PostgreSQL + Auth + Storage + Realtime)
+Authentication
+Custom admin-issued login (Supabase Auth or custom table-based)
+Hosting
+Vercel / Netlify (frontend) + Supabase (backend)
+Export
+CSV / Excel export from Supabase Table Editor or a custom 'Export' button
+9. Summary — Order of Operations
+The user submits an access request with their own chosen email/password + name/designation + how many questions they want to solve (N, self-requested) — the login/request page looks like a completely normal/standard login page
+Admin reviews the request, decides to accept or reject it, sets a fresh expiry date, and can adjust the question-limit up or down from what the user requested
+The user is given N random (unused) questions on a Google-Form-like screen
+The user reads each question's answer, gives a rating, writes a comment, and provides a new answer if they wish
+All the data is saved to Supabase's 'responses' table
+Those N questions are now permanently marked 'used' — they will never be shown to anyone again
+Once the expiry date passes, login with that same email/password stops working — the user must submit a fresh request (same as before) for the admin to accept/reject and set a new expiry date
+The admin dashboard continues to show real-time progress, stats, and pending requests
+The admin can download all the data as a CSV at any time
+This document is currently at the requirement-planning stage — in the next step we can finalize the wireframes and begin development.

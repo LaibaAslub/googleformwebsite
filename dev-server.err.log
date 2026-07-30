@@ -1,0 +1,118 @@
+[browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/" notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head>
+                  <__next_root_layout_boundary__>
+                    <SegmentViewNode type="layout" pagePath="layout.tsx">
+                      <SegmentTrieNode>
+                      <link>
+                      <RootLayout>
+                        <html
+                          lang="en"
+-                         suppresshydrationwarning="true"
+-                         data-qb-installed="true"
+                        >
+                  ...
+ 
+[browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/admin/login" notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head>
+                  <__next_root_layout_boundary__>
+                    <SegmentViewNode type="layout" pagePath="layout.tsx">
+                      <SegmentTrieNode>
+                      <link>
+                      <RootLayout>
+                        <html lang="en" suppressHydrationWarning={true}>
+                          <body
+-                           data-new-gr-c-s-check-loaded="14.1313.0"
+-                           data-gr-ext-installed=""
+-                           cz-shortcut-listen="true"
+                          >
+                  ...
+ 
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⨯ ReferenceError: remainingQuestions is not defined
+    at ProgressClient (src\app\admin\(dashboard)\progress\ProgressClient.tsx:323:72)
+  321 | ...{ display: 'flex', justifyContent: 'space-between', gap: '12px', fontSize: '0.85rem' }}>
+  322 | ...e={{ color: '#4b5563' }}>Remaining Questions</span>
+> 323 | ...e={{ color: '#111827', fontWeight: 700 }}>{remainingQuestions}</span>
+      |                                               ^
+  324 | ...
+  325 | ...{ display: 'flex', justifyContent: 'space-between', gap: '12px', fontSize: '0.85rem' }}>
+  326 | ...e={{ color: '#4b5563' }}>Total Assigned Limit</span> {
+  digest: '1796451569'
+}
+⨯ ReferenceError: remainingQuestions is not defined
+    at ProgressClient (src\app\admin\(dashboard)\progress\ProgressClient.tsx:323:72)
+  321 | ...{ display: 'flex', justifyContent: 'space-between', gap: '12px', fontSize: '0.85rem' }}>
+  322 | ...e={{ color: '#4b5563' }}>Remaining Questions</span>
+> 323 | ...e={{ color: '#111827', fontWeight: 700 }}>{remainingQuestions}</span>
+      |                                               ^
+  324 | ...
+  325 | ...{ display: 'flex', justifyContent: 'space-between', gap: '12px', fontSize: '0.85rem' }}>
+  326 | ...e={{ color: '#4b5563' }}>Total Assigned Limit</span> {
+  digest: '1796451569'
+}
+[browser] Uncaught ReferenceError: remainingQuestions is not defined
+    at ProgressClient (src\app\admin\(dashboard)\progress\ProgressClient.tsx:323:72)
+    at ProgressPage (src\app\admin\(dashboard)\progress\page.tsx:154:7)
+  321 | ...{ display: 'flex', justifyContent: 'space-between', gap: '12px', fontSize: '0.85rem' }}>
+  322 | ...e={{ color: '#4b5563' }}>Remaining Questions</span>
+> 323 | ...e={{ color: '#111827', fontWeight: 700 }}>{remainingQuestions}</span>
+      |                                               ^
+  324 | ...
+  325 | ...{ display: 'flex', justifyContent: 'space-between', gap: '12px', fontSize: '0.85rem' }}>
+  326 | ...e={{ color: '#4b5563' }}>Total Assigned Limit</span>
+[browser] Uncaught ReferenceError: remainingQuestions is not defined
+    at ProgressClient (src\app\admin\(dashboard)\progress\ProgressClient.tsx:323:72)
+    at ProgressPage (src\app\admin\(dashboard)\progress\page.tsx:154:7)
+  321 | ...{ display: 'flex', justifyContent: 'space-between', gap: '12px', fontSize: '0.85rem' }}>
+  322 | ...e={{ color: '#4b5563' }}>Remaining Questions</span>
+> 323 | ...e={{ color: '#111827', fontWeight: 700 }}>{remainingQuestions}</span>
+      |                                               ^
+  324 | ...
+  325 | ...{ display: 'flex', justifyContent: 'space-between', gap: '12px', fontSize: '0.85rem' }}>
+  326 | ...e={{ color: '#4b5563' }}>Total Assigned Limit</span>
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[browser] ⨯ unhandledRejection: ChunkLoadError: Failed to load chunk /_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1xch-cm._.js from module [turbopack]/browser/dev/hmr-client/hmr-client.ts [app-client] (ecmascript, async loader)
+    at <unknown> (file://C:/Users/HP/Downloads/myalltask/judgesquestion1/.next/dev/static/chunks/turbopack-_01_ro95._.js:698:25)
