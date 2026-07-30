@@ -63,6 +63,12 @@ export default function PendingClient({
   const [limitInput, setLimitInput] = useState('15');
   const [busy, setBusy] = useState(false);
 
+  const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
+  const [showBulkModal, setShowBulkModal] = useState(false);
+  const [bulkExpiryInput, setBulkExpiryInput] = useState('');
+  const [bulkLimitInput, setBulkLimitInput] = useState('15');
+  const [bulkBusy, setBulkBusy] = useState(false);
+
   const statusChartData = useMemo(() => ([
     { name: 'Pending', value: safeStats.pendingCount, color: '#eab308' },
     { name: 'Approved', value: safeStats.approvedCount, color: '#16a34a' },
@@ -113,6 +119,61 @@ export default function PendingClient({
     }
   };
 
+  const handleBulkApprove = async () => {
+    if (selectedUserIds.length === 0) return;
+    setBulkBusy(true);
+
+    const payload: Record<string, unknown> = {
+      userIds: selectedUserIds,
+      action: 'approve',
+    };
+
+    if (bulkExpiryInput) {
+      const d = new Date(bulkExpiryInput);
+      payload.expiryDate = d.toISOString();
+    } else {
+      payload.expiryDate = null;
+    }
+
+    const parsedLimit = parseInt(bulkLimitInput, 10);
+    if (!Number.isNaN(parsedLimit) && parsedLimit > 0) {
+      payload.questionLimit = parsedLimit;
+    }
+
+    const res = await fetch('/api/admin/bulk-action', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    setBulkBusy(false);
+
+    if (res.ok) {
+      setShowBulkModal(false);
+      setSelectedUserIds([]);
+      window.location.reload();
+    } else {
+      const data = await res.json();
+      alert(`Bulk action failed: ${data.error}`);
+    }
+  };
+
+  const toggleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedUserIds(users.map(u => u.id));
+    } else {
+      setSelectedUserIds([]);
+    }
+  };
+
+  const toggleSelectUser = (id: string, checked: boolean) => {
+    if (checked) {
+      setSelectedUserIds(prev => [...prev, id]);
+    } else {
+      setSelectedUserIds(prev => prev.filter(userId => userId !== id));
+    }
+  };
+
   return (
     <>
       <div className="pageHeader">
@@ -159,10 +220,42 @@ export default function PendingClient({
         </div>
       </div>
 
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', marginTop: '32px' }}>
+        <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: '#111827' }}>Pending Requests</h2>
+        {selectedUserIds.length > 0 && (
+          <button
+            onClick={() => setShowBulkModal(true)}
+            style={{
+              backgroundColor: '#4338ca',
+              color: 'white',
+              border: 'none',
+              padding: '8px 16px',
+              borderRadius: '6px',
+              fontWeight: 500,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}
+          >
+            <CheckCircle2 size={16} />
+            Bulk Approve ({selectedUserIds.length})
+          </button>
+        )}
+      </div>
+
       <div className="tableContainer">
         <table className="table">
           <thead>
             <tr>
+              <th style={{ width: '40px', textAlign: 'center' }}>
+                <input
+                  type="checkbox"
+                  checked={users.length > 0 && selectedUserIds.length === users.length}
+                  onChange={(e) => toggleSelectAll(e.target.checked)}
+                  style={{ cursor: 'pointer' }}
+                />
+              </th>
               <th>Name</th>
               <th>Designation</th>
               <th>Email</th>
@@ -174,13 +267,21 @@ export default function PendingClient({
           <tbody>
             {users.length === 0 && (
               <tr>
-                <td colSpan={6} style={{ textAlign: 'center' }}>No pending requests.</td>
+                <td colSpan={7} style={{ textAlign: 'center' }}>No pending requests.</td>
               </tr>
             )}
             {users.map(user => {
               const initials = user.full_name.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase();
               return (
-                <tr key={user.id}>
+                <tr key={user.id} style={{ backgroundColor: selectedUserIds.includes(user.id) ? '#f5f3ff' : 'transparent' }}>
+                  <td style={{ textAlign: 'center' }}>
+                    <input
+                      type="checkbox"
+                      checked={selectedUserIds.includes(user.id)}
+                      onChange={(e) => toggleSelectUser(user.id, e.target.checked)}
+                      style={{ cursor: 'pointer' }}
+                    />
+                  </td>
                   <td style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#e5e7eb', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 600, color: '#374151' }}>
                       {initials}
@@ -369,6 +470,82 @@ export default function PendingClient({
                 title={!expiryInput ? 'Expiry Date is required' : ''}
               >
                 Approve User
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Approval Modal */}
+      {showBulkModal && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50 }} data-no-scroll-reveal>
+          <div className="card animateSlideUp" style={{ width: '440px', maxWidth: '92%' }}>
+            <h2 style={{ marginBottom: '16px' }}>Bulk Approve Requests</h2>
+            <div style={{ marginBottom: '20px', fontSize: '0.9rem', color: '#4b5563' }}>
+              You are about to approve <strong>{selectedUserIds.length}</strong> users.
+            </div>
+
+            <div style={{ display: 'grid', gap: '12px', marginBottom: '20px' }}>
+              <label style={{ display: 'grid', gap: '6px', fontSize: '0.85rem', color: '#374151', fontWeight: 600 }}>
+                Questions to Add (Applied to all)
+                <input
+                  type="number"
+                  min={1}
+                  value={bulkLimitInput}
+                  onChange={(e) => setBulkLimitInput(e.target.value)}
+                  style={{
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    padding: '10px 12px',
+                    fontSize: '0.9rem',
+                    outline: 'none',
+                  }}
+                />
+              </label>
+
+              <label style={{ display: 'grid', gap: '6px', fontSize: '0.85rem', color: '#374151', fontWeight: 600 }}>
+                Expiry Date (Applied to all)
+                <input
+                  type="date"
+                  value={bulkExpiryInput}
+                  onChange={(e) => setBulkExpiryInput(e.target.value)}
+                  style={{
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    padding: '10px 12px',
+                    fontSize: '0.9rem',
+                    outline: 'none',
+                  }}
+                />
+                <span style={{ fontWeight: 400, color: '#6b7280', fontSize: '0.8rem' }}>
+                  Controls how long the users' email/password access remains valid. <span style={{ color: '#dc2626' }}>Required for approval.</span>
+                </span>
+              </label>
+            </div>
+
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+              <button
+                className="outlineBtn"
+                onClick={() => setShowBulkModal(false)}
+                disabled={bulkBusy}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleBulkApprove}
+                disabled={bulkBusy || !bulkExpiryInput}
+                style={{ 
+                  backgroundColor: (bulkBusy || !bulkExpiryInput) ? '#9ca3af' : '#4338ca', 
+                  color: '#ffffff', 
+                  border: 'none', 
+                  padding: '8px 16px', 
+                  borderRadius: '6px', 
+                  fontWeight: 500, 
+                  cursor: (bulkBusy || !bulkExpiryInput) ? 'not-allowed' : 'pointer' 
+                }}
+                title={!bulkExpiryInput ? 'Expiry Date is required' : ''}
+              >
+                {bulkBusy ? 'Approving...' : `Approve ${selectedUserIds.length} Users`}
               </button>
             </div>
           </div>

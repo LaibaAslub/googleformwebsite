@@ -151,7 +151,7 @@ export default function ReviewPage() {
       <div className={styles.reviewWrapper}>
         <div className={styles.container}>
           <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-            <img src="/banner.png" alt="University Banner" style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px' }} />
+            {/* <img src="/banner.png" alt="University Banner" style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px' }} /> */}
           </div>
           <div className={styles.mainHeader}>Hallucination Feedback</div>
           <div className={`${styles.card} ${styles.progressCard}`}>
@@ -175,7 +175,7 @@ export default function ReviewPage() {
         <div className={styles.container}>
           {/* Banner */}
           <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-            <img src="/banner.png" alt="University Banner" style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px' }} />
+            {/* <img src="/banner.png" alt="University Banner" style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px' }} /> */}
           </div>
           <div className={styles.mainHeader}>Hallucination Feedback</div>
           <div className={`${styles.card} ${styles.progressCard}`}>
@@ -193,7 +193,7 @@ export default function ReviewPage() {
         <div className={styles.container}>
           {/* Banner */}
           <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-            <img src="/banner.png" alt="University Banner" style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px' }} />
+            {/* <img src="/banner.png" alt="University Banner" style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px' }} /> */}
           </div>
           <div className={styles.mainHeader}>Hallucination Feedback</div>
           <div className={`${styles.card} ${styles.progressCard}`}>
@@ -215,7 +215,7 @@ export default function ReviewPage() {
         
         {/* Banner */}
         <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-          <img src="/banner.png" alt="University Banner" style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px' }} />
+          {/* <img src="/banner.png" alt="University Banner" style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px' }} /> */}
         </div>
 
         {/* Main Header */}
