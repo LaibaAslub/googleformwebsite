@@ -15,7 +15,12 @@ export default function QuestionsClient({ questions, metrics }: { questions: any
   const [previewQ, setPreviewQ] = useState<any>(null);
   const [editQ, setEditQ] = useState<any>(null);
   const [addModal, setAddModal] = useState(false);
-  const [newQ, setNewQ] = useState({ question_text: '', existing_answer: '', category: 'General Law' });
+  const [newQ, setNewQ] = useState({
+    question_text: '',
+    existing_answer: '',
+    reference: '',
+    category: 'General Law'
+  });
   const [loading, setLoading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
