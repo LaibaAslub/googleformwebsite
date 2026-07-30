@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import type { Variants } from 'framer-motion';
 import styles from '../../login.module.css';
 
 export default function AdminLogin() {
@@ -36,7 +37,7 @@ export default function AdminLogin() {
     }
   };
 
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0, y: 30, scale: 0.95 },
     visible: { 
       opacity: 1, 
@@ -44,13 +45,13 @@ export default function AdminLogin() {
       scale: 1,
       transition: { 
         duration: 0.6, 
-        ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
+        ease: 'easeOut',
         staggerChildren: 0.1 
       }
     }
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { opacity: 0, y: 15 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } }
   };

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import type { Variants } from 'framer-motion';
 import styles from './login.module.css';
 
 export default function LoginPage() {
@@ -42,7 +43,7 @@ export default function LoginPage() {
     }
   };
 
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0, y: 30, scale: 0.95 },
     visible: { 
       opacity: 1, 
@@ -50,13 +51,13 @@ export default function LoginPage() {
       scale: 1,
       transition: { 
         duration: 0.6, 
-        ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
+        ease: 'easeOut',
         staggerChildren: 0.1 
       }
     }
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { opacity: 0, y: 15 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } }
   };
@@ -135,7 +136,7 @@ export default function LoginPage() {
             <Link href="/forgot-password" className={styles.link} style={{ display: 'block', marginBottom: '1rem' }}>
               Forgot password?
             </Link>
-            Don't have an account?{' '}
+            Don&apos;t have an account?{' '}
             <Link href="/signup" className={styles.link}>
               Sign up here
             </Link>
