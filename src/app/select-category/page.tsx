@@ -1,30 +1,32 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import type { Variants } from 'framer-motion';
-import styles from './login.module.css';
+import styles from '../login.module.css';
 
-export default function LoginPage() {
+export default function SelectCategoryPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleCategorySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!selectedCategory) {
+      setError('Please select a category');
+      return;
+    }
+    
     setLoading(true);
     setError('');
 
     try {
-      const res = await fetch('/api/auth/login', {
+      const res = await fetch('/api/auth/select-category', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ category: selectedCategory })
       });
 
       const data = await res.json();
@@ -49,11 +51,7 @@ export default function LoginPage() {
       opacity: 1, 
       y: 0, 
       scale: 1,
-      transition: { 
-        duration: 0.6, 
-        ease: 'easeOut',
-        staggerChildren: 0.1 
-      }
+      transition: { duration: 0.6, ease: 'easeOut', staggerChildren: 0.1 }
     }
   };
 
@@ -77,8 +75,8 @@ export default function LoginPage() {
             </svg>
             PORTAL
           </div>
-          <h1 className={styles.title}>Sign in to your account</h1>
-          <p className={styles.subtitle}>Welcome back. Please enter your credentials.</p>
+          <h1 className={styles.title}>Select Legal Category</h1>
+          <p className={styles.subtitle}>Please choose your area of expertise to continue.</p>
         </motion.div>
 
         {error && (
@@ -95,51 +93,39 @@ export default function LoginPage() {
             {error}
           </motion.div>
         )}
-        <form onSubmit={handleSubmit}>
+
+        <form onSubmit={handleCategorySubmit}>
           <motion.div className={styles.formGroup} variants={itemVariants}>
-            <label className={styles.label}>Email</label>
-            <input 
-              type="email" 
-              name="email"
-              className={styles.inputField}
-              placeholder="name@company.com" 
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required 
-            />
-          </motion.div>
-          
-          <motion.div className={styles.formGroup} variants={itemVariants}>
-            <label className={styles.label}>Password</label>
-            <input 
-              type="password" 
-              name="password"
-              className={styles.inputField}
-              placeholder="••••••••" 
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required 
-            />
+            <div className={styles.categoryGrid}>
+              {[
+                { name: 'Civil', desc: 'Civil law related questions' },
+                { name: 'Criminal', desc: 'Criminal law related questions' },
+                { name: 'Family', desc: 'Family law related questions' }
+              ].map((cat) => (
+                <button
+                  key={cat.name}
+                  type="button"
+                  onClick={() => setSelectedCategory(cat.name.toLowerCase())}
+                  className={`${styles.categoryBtn} ${selectedCategory === cat.name.toLowerCase() ? styles.categoryBtnActive : ''}`}
+                  style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}
+                >
+                  <span style={{ fontWeight: 600, fontSize: '1.2rem' }}>{cat.name}</span>
+                  <span style={{ fontSize: '0.85rem', color: selectedCategory === cat.name.toLowerCase() ? '#818cf8' : '#94a3b8' }}>
+                    {cat.desc}
+                  </span>
+                </button>
+              ))}
+            </div>
           </motion.div>
 
           <motion.button 
             type="submit" 
             className={styles.submitBtn} 
-            disabled={loading}
+            disabled={loading || !selectedCategory}
             variants={itemVariants}
           >
-            {loading ? 'Signing in...' : 'Sign In'}
+            {loading ? 'Saving...' : 'Continue'}
           </motion.button>
-          
-          <motion.div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.9rem', color: '#94a3b8' }} variants={itemVariants}>
-            <Link href="/forgot-password" className={styles.link} style={{ display: 'block', marginBottom: '1rem' }}>
-              Forgot password?
-            </Link>
-            Don&apos;t have an account?{' '}
-            <Link href="/signup" className={styles.link}>
-              Sign up here
-            </Link>
-          </motion.div>
         </form>
       </motion.div>
     </div>

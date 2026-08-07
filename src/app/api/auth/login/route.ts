@@ -59,6 +59,9 @@ export async function POST(req: Request) {
     if (user.status === 'approved') {
       const token = await signToken({ userId: user.id, email: normalizedEmail, role: 'user' });
       await setAuthCookie(token);
+
+      // Always route to /review — the review page itself will redirect to /select-category
+      // if questions need to be assigned (needsCategory response from the API)
       console.log('[login redirect decision]', { ...debugBase, destination: '/review' });
       return NextResponse.json(
         { success: true, redirect: '/review' },

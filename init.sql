@@ -41,6 +41,7 @@ CREATE TABLE responses (
     question_text TEXT NOT NULL,
     original_answer TEXT NOT NULL,
     reference TEXT,
+    category TEXT,
     user_comment TEXT,
     rating INTEGER CHECK (rating >= 1 AND rating <= 5),
     new_answer TEXT,
@@ -51,6 +52,7 @@ CREATE TABLE responses (
 CREATE TABLE review_progress (
     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
     question_id INTEGER REFERENCES questions(id) ON DELETE CASCADE,
+    category TEXT,
     user_comment TEXT,
     rating INTEGER CHECK (rating >= 1 AND rating <= 5),
     new_answer TEXT,

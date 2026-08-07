@@ -41,6 +41,7 @@ export async function POST(req: Request) {
       question_text: r.question_text,
       original_answer: r.original_answer,
       reference: r.reference || null,
+      category: r.category || null,
       user_comment: r.user_comment,
       rating: r.rating,
       new_answer: r.new_answer,

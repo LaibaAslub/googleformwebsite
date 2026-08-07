@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { verifyToken } from '@/lib/auth';
 import { cookies } from 'next/headers';
+import { getPendingRequestForUser } from '@/lib/question-requests';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -14,29 +15,7 @@ async function getLifetimeCompletedQuestions(userId: string) {
 
   return new Set((data || []).map(r => r.question_id).filter(Boolean)).size;
 }
-async function assignAvailableQuestions(userId: string, count: number) {
-  if (count <= 0) return 0;
 
-  const { data: available } = await supabase
-    .from('questions')
-    .select('id')
-    .eq('status', 'available')
-    .limit(count);
-
-  const ids = (available || []).map(q => q.id);
-  if (ids.length === 0) return 0;
-
-  const { error } = await supabase
-    .from('questions')
-    .update({
-      status: 'assigned',
-      assigned_to: userId,
-      assigned_at: new Date().toISOString(),
-    })
-    .in('id', ids);
-
-  return error ? 0 : ids.length;
-}
 
 export async function GET() {
   const token = (await cookies()).get('auth-token')?.value;
@@ -96,23 +75,16 @@ export async function GET() {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  let assignedQuestions = questions || [];
+  const assignedQuestions = questions || [];
   const remainingQuestions = Math.max(questionLimit - questionsCompleted, 0);
 
-  if (remainingQuestions > assignedQuestions.length) {
-    await assignAvailableQuestions(userId, remainingQuestions - assignedQuestions.length);
-    const refreshed = await supabase
-      .from('questions')
-      .select('id, question_text, existing_answer, category, reference')
-      .eq('assigned_to', userId)
-      .eq('status', 'assigned')
-      .order('id', { ascending: true });
-
-    if (refreshed.error) return NextResponse.json({ error: refreshed.error.message }, { status: 500 });
-    assignedQuestions = refreshed.data || [];
-  }
-
   const isComplete = questionLimit > 0 && questionsCompleted >= questionLimit;
+  
+  let hasPendingRequest = false;
+  if (isComplete) {
+    const pendingReq = await getPendingRequestForUser(userId);
+    hasPendingRequest = !!pendingReq;
+  }
 
   if (assignedQuestions.length === 0 && isComplete) {
     console.log('[review questions decision]', {
@@ -131,6 +103,7 @@ export async function GET() {
           questionsCompleted,
           questionLimit,
           hasSubmitted: true,
+          hasPendingRequest,
         },
       },
       { headers: { 'Cache-Control': 'no-store' } }
@@ -143,6 +116,14 @@ export async function GET() {
     .eq('user_id', userId);
 
   const savedProgress = progressData || [];
+  
+  if (!isComplete && remainingQuestions > 0 && assignedQuestions.length === 0) {
+    return NextResponse.json(
+      { needsCategory: true },
+      { headers: { 'Cache-Control': 'no-store' } }
+    );
+  }
+
   const destination = assignedQuestions.length > 0 ? 'questions' : 'no-questions-assigned';
   console.log('[review questions decision]', {
     ...debugBase,
@@ -162,6 +143,7 @@ export async function GET() {
         questionsCompleted,
         questionLimit,
         hasSubmitted: questionLimit > 0 && questionsCompleted >= questionLimit,
+        hasPendingRequest,
       },
     },
     { headers: { 'Cache-Control': 'no-store' } }

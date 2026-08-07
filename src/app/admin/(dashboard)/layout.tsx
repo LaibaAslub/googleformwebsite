@@ -20,7 +20,8 @@ import {
   XCircle,
   AlertTriangle,
   MessageSquare,
-  Users
+  Users,
+  MessageCircleQuestion
 } from 'lucide-react';
 import '../admin.css'; // Global admin styles
 import ScrollReveal from './ScrollReveal';
@@ -90,6 +91,7 @@ export default function AdminLayout({
   const navItems = [
     { label: 'Overview', href: '/admin/overview', icon: LayoutDashboard },
     { label: 'Pending Requests', href: '/admin/pending', icon: ClipboardList },
+    { label: 'Question Requests', href: '/admin/question-requests', icon: MessageCircleQuestion },
     { label: 'User Progress', href: '/admin/progress', icon: TrendingUp },
     { label: 'Users', href: '/admin/users', icon: Users },
     { label: 'Question Bank', href: '/admin/questions', icon: Database },

@@ -10,7 +10,7 @@ export async function POST(req: Request) {
   const payload = await verifyToken(token);
   if (!payload || !payload.userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const { questionId, rating, comment, newAnswer } = await req.json();
+  const { questionId, category, rating, comment, newAnswer } = await req.json();
 
   if (!questionId) {
     return NextResponse.json({ error: 'Missing questionId' }, { status: 400 });
@@ -22,6 +22,7 @@ export async function POST(req: Request) {
     .upsert({
       user_id: payload.userId,
       question_id: questionId,
+      category: category || null,
       rating: rating || null,
       user_comment: comment || '',
       new_answer: newAnswer || '',
