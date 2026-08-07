@@ -183,7 +183,11 @@ export async function POST(req: Request) {
 
       if (userError) return NextResponse.json({ error: userError.message }, { status: 500 });
 
-      if (action === 'approve' || action === 'reactivate' || action === 'change_limit') {
+      // NOTE: We do NOT auto-assign questions on 'approve'.
+      // After login the user is redirected to /select-category where they pick a category;
+      // questions are then assigned from that chosen category.
+      // syncUserQuestions is only called for 'change_limit' and 'reactivate' (post-category flows).
+      if (action === 'reactivate' || action === 'change_limit') {
         const targetLimit = action === 'change_limit'
           ? Math.max(requestedLimit, completedQuestions)
           : Number(effectiveQuestionLimit || targetUser?.question_limit || 10);

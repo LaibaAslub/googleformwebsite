@@ -117,7 +117,18 @@ export async function GET() {
 
   const savedProgress = progressData || [];
   
-  if (!isComplete && remainingQuestions > 0 && assignedQuestions.length === 0) {
+  // Redirect to category selection when:
+  //  1. User has no assigned questions currently AND
+  //  2. They have NOT yet completed their quota (including brand-new users where questionLimit === 0)
+  // This covers first-time users (questionLimit=0 → remainingQuestions=0 but isComplete is also false)
+  // and returning users whose assigned batch was cleared after a new request.
+  if (!isComplete && assignedQuestions.length === 0) {
+    console.log('[review questions decision]', {
+      ...debugBase,
+      questions_completed: questionsCompleted,
+      assignedQuestions: 0,
+      destination: 'select-category (needsCategory)',
+    });
     return NextResponse.json(
       { needsCategory: true },
       { headers: { 'Cache-Control': 'no-store' } }

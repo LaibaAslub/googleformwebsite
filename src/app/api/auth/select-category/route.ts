@@ -35,42 +35,69 @@ export async function POST(req: Request) {
     if (userError || !user) throw new Error('User not found');
 
     const limit = Number(user.question_limit || 0);
-    const completed = Number(user.questions_completed || 0);
-    const remaining = Math.max(limit - completed, 0);
+
+    // Admin hasn't configured a question limit for this user yet.
+    // Return a clear error so the UI can show "please ask admin to set your limit".
+    if (limit === 0) {
+      return NextResponse.json(
+        { error: 'Your account is approved but your administrator has not yet set your question limit. Please contact your administrator.' },
+        { status: 400 }
+      );
+    }
+
+    // Use lifetime-completed count from responses table for accuracy
+    const { data: responsesData } = await supabase
+      .from('responses')
+      .select('question_id')
+      .eq('user_id', userId);
+    const lifetimeCompleted = new Set((responsesData || []).map((r: any) => r.question_id).filter(Boolean)).size;
+
+    const remaining = Math.max(limit - lifetimeCompleted, 0);
 
     if (remaining > 0) {
-      // Check already assigned to not over-assign
-      const { data: assigned } = await supabase
+      // Unassign any previously assigned questions from a different category
+      // so we start fresh with the newly chosen category
+      const { data: previouslyAssigned } = await supabase
         .from('questions')
         .select('id')
         .eq('assigned_to', userId)
         .eq('status', 'assigned');
-        
-      const alreadyAssignedCount = assigned ? assigned.length : 0;
-      const countToAssign = remaining - alreadyAssignedCount;
-      
-      if (countToAssign > 0) {
-        // Assign available questions
-        const { data: available } = await supabase
+
+      if (previouslyAssigned && previouslyAssigned.length > 0) {
+        const prevIds = previouslyAssigned.map((q: any) => q.id);
+        await supabase
           .from('questions')
-          .select('id')
-          .eq('status', 'available')
-          .ilike('category', cat)
-          .limit(countToAssign);
-          
-        const ids = (available || []).map(q => q.id);
-        if (ids.length > 0) {
-          const { error: assignError } = await supabase
-            .from('questions')
-            .update({
-              status: 'assigned',
-              assigned_to: userId,
-              assigned_at: new Date().toISOString(),
-            })
-            .in('id', ids);
-            
-          if (assignError) throw new Error(assignError.message);
-        }
+          .update({ status: 'available', assigned_to: null, assigned_at: null })
+          .in('id', prevIds);
+      }
+
+      // Assign questions from the chosen category
+      const { data: available } = await supabase
+        .from('questions')
+        .select('id')
+        .eq('status', 'available')
+        .ilike('category', cat)
+        .limit(remaining);
+
+      const ids = (available || []).map((q: any) => q.id);
+      if (ids.length > 0) {
+        const { error: assignError } = await supabase
+          .from('questions')
+          .update({
+            status: 'assigned',
+            assigned_to: userId,
+            assigned_at: new Date().toISOString(),
+          })
+          .in('id', ids);
+
+        if (assignError) throw new Error(assignError.message);
+      }
+
+      if (ids.length === 0) {
+        return NextResponse.json(
+          { error: `No questions available in the "${cat}" category at this time. Please choose a different category or contact your administrator.` },
+          { status: 400 }
+        );
       }
     }
 
